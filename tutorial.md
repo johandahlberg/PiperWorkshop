@@ -1,28 +1,28 @@
 Queue/Piper workshop [insert date]
 ==================================
 
-This document contains a small tutorial for the Piper workshop on [insert date]. The idea is to have a small workshop about Queue/Piper, going through the basics of how Queue/Pipere works and getting some hands on experience in writing qscripts.
+This document contains a small tutorial for the Piper workshop on [insert date]. The idea is to have a small workshop about Queue/Piper, going through the basics of how Queue/Piper works and getting some hands on experience in writing qscripts.
 
 Prerequisites
--------------
+------------------
 To follow this workshop you need to have the following programs installed:
 
     git
     sun-java 1.7
     ant
-    scala-ide (optional - though it will make Scala coding a lot simpler)
+    [scala-ide](http://scala-ide.org/index.html) (optional - though it will make Scala coding a lot simpler)
     
 If you want to be able to test run things on Uppmax you will also need a uppmax account.
 
 Introductions
--------------
-The text below might contain some jargon which is unfamiliar to you. Try not to get stuck, but move on and hopefully all will be clearer once you've started working with it in practice.
+------------------
+The text below might contain some jargon which is unfamiliar to you. Try not to get stuck, but move on and hopefully it all will be clearer once you've started working with it in practice.
 
 **A very brief introduction to Scala**
 
 It will of course be impossible to cover everything in the Scala language here, and there are plenty of resources on the net which you can look through if you are interested. This will be a very brief introduction hopefully containing enough to allow you to start writing qscripts. 
 
-Scala is a object oriented cross-paragdigm language which compiles to java byte code runs on the Java Virtual Machine. To access the full power of Scala one should program in a functional style, but it's absolutely possible to write imperative style code in scala. 
+Scala is a object oriented cross-paradigm language which compiles to java byte code and runs on the Java Virtual Machine. To access the full power of Scala one should program in a functional style, but it's absolutely possible to write imperative style code in scala. 
 
 Scala is very similary to Java, so if you've worked with Java before you should be able to jump straight into it.
     
@@ -41,13 +41,13 @@ Scala is very similary to Java, so if you've worked with Java before you should 
         // Class body
     }
     
-    // Declase a case class (a special type of class which where natural equals methods are auto generated, and that can be use to do pattern matching.
+    // Declare a case class (a special type of class which where natural equals methods are auto generated, and that can be use to do pattern matching.
     case class Point(x: Int, y: Int)
     
     // This means that the following will return true (which it would not do in Java without writing a custom equals method.
     Point(1,1) == Point(1,1)
     
-    // As scala is a functional language, so functions are at the hearth of it. Here is how you declare a very simple one:
+    // As Scala is a functional language, so functions are at the hearth of it. Here is how you declare a very simple one:
     def square(x: Int): Int = x * x
     
     // A slightly more complex example is:
@@ -61,13 +61,13 @@ Scala is very similary to Java, so if you've worked with Java before you should 
     class ColoredPoint(color: String)
     class TwoDimensionalPoint(color: String, x: Int, y: Int) extends ColoredPoint(color)
     
-    // Scala also has something called traits (similar to interfaces in Java). A class can only inherit one class, but it can implement multiple traits. They can contain implemented fields and functions, or unimplemeted ones (this will force the implementing class to provide a implementation).
+    // Scala also has something called traits (similar to interfaces in Java). A class can only inherit one class, but it can implement multiple traits. They can contain implemented fields and functions, or unimplemented ones (this will force the implementing class to provide a implementation).
     trait Pingable {
         def ping: String = "Pong"
         def pong: String
     }
     
-    // Traits are added to classes using the with key-word.
+    // Traits are added to classes using the "with" key-word.
     class TwoDimensionalPoint(color: String, x: Int, y: Int) 
         extends ColoredPoint(color)
         with Pingable {
@@ -81,30 +81,32 @@ If you want to learn more about Scala (and read better tutorials than this one) 
 [INSERT LIST OF LINKS]
 
 **Queue** <br/>
-[Queue](http://www.broadinstitute.org/gatk/guide/topic?name=queue) is a framework for writing pipelines developed by the Broad and is relased under a MIT licence. Queue is build in scala and contains a few core concepts which will be covered below. Only the basics will be covered here. For more you material, here are some useful resources:
+[Queue](http://www.broadinstitute.org/gatk/guide/topic?name=queue) is a framework for writing pipelines developed by the Broad and is released under a MIT licence. Queue is built in Scala and contains a few core concepts which will be covered below. Only the basics will be covered here. For more you material, here are some useful resources:
 
 http://www.broadinstitute.org/gatk/guide/events?id=3391
 http://www.broadinstitute.org/gatk/guide/topic?name=queue
 
 Some of the advantages of using Queue are:
-* Parallelizes workflows
+* Parallelize workflows
 * Supports reruns
 * Possible to create reusable components
 * Excellent support for the GATK suite
 * Relatively simple to add new components to a pipeline
 
 *Qscripts*</br>
-The qscript is at the heart of Queue. It's were you define how your pipeline is going to run.  It's written in Scala with some syntactic sugar. In your qscript you will add Commandline Functions to a dependency graph which will be run by Queue.
+The qscript is at the heart of Queue. It's were you define how your pipeline is going to run.  It's written in Scala with some syntactic sugar. In your qscript you will add Command line functions to a dependency graph which will be run by Queue.
 
 Formally a QScript is a class which extends `QScript` and that defines the function `script()`. Furthermore it will typically define (or import) a number of CommandLineFunction and define a have a number of arguments which can be passed to it when running it from the commandline.
 
 Here's a tiny example of what a QScript can look like:
 
+    package molmed.qscripts
+    
     import org.broadinstitute.sting.queue.QScript
     
     class MyAwesomeQScript extends QScript {
     
-        // A argument that should be passed to the QScript from the commandline 
+        // A argument that should be passed to the qscript from the command line 
         @Input(doc = "input fasta file", shortName = "i", required = true)
         var input: File = _
     
@@ -115,9 +117,9 @@ Here's a tiny example of what a QScript can look like:
     }
 
 *CommandLineFunction*</br>
-If qscripts are the hearth of Queue, CommandLineFunctions are it's blood. A CommandLineFunction constructs the acutal commands to be run. Each program that is run by Queue is defined as a case class extending the CommandLineFunction class. It defines inputs and outputs which is how Queue knows how to chain the jobs together.
+If qscripts are the heart of Queue, CommandLineFunctions are it's blood. A CommandLineFunction constructs the actual commands to be run. Each program that is run by Queue is defined as a case class extending the CommandLineFunction class. It defines inputs and outputs, which is how Queue knows how to chain the jobs together into a dependency graph.
 
-Formally a CommandLineFunction is a class which extends the `CommandLineFunction` class and which defines the `commandline` function. Here's an example which finds runs a simple *nix onliner to find the number of occurences of each sequence in a fasta file.
+Formally a CommandLineFunction is a class which extends the `CommandLineFunction` class and which defines the `commandline` function. Here's an example which finds runs a simple *nix oneliner to find the number of occurrences of each sequence in a fasta file.
 
     case clase NaiveSequenceCounter(@Input fastaFile: File, @Output sequenceCounts: File) extends CommandLineFunction {
         def commandLine = "cat " + fastaFile + 
@@ -130,13 +132,15 @@ The gist is, anything you can run on the commandline you can run with Queue.
 *Put it together using add()*</br>
 The key to putting the two things above together is using the `add()` function. This is is how you define what jobs are to be added to the dependency graph and run by Queue. An example of this:
 
+    package molmed.qscripts
+
     import org.broadinstitute.sting.queue.QScript
     import java.io.File
     import org.broadinstitute.sting.commandline.Argument
     
     class MyAwesomeQScript extends QScript {
     
-      // An argument that should be passed to the QScript from the commandline 
+      // An argument that should be passed to the qscript from the commandline 
       @Input(doc = "input fasta file", shortName = "i", required = true)
       var input: File = _
     
@@ -172,17 +176,17 @@ The key to putting the two things above together is using the `add()` function. 
 Note that it does not matter in which order you add the functions. It is the input chain of input and output files that matter, Queue handles the rest.
 
 **Piper** <br/>
-Piper is build on top of Queue, and is basically a extension of Queue which allows Queue to be run on Uppmax. Futhermore it contains a number of predefined workflows, for example for exome resequencing, which are simple to deploy provided that your data has been generated by the SNP&SEQ Technology platform.
+Piper is build on top of Queue, and is basically a extension of Queue which allows Queue to be run on Uppmax. Furthermore it contains a number of predefined workflows, for example for exome resequencing, which are simple to deploy provided that your data has been generated by the SNP&SEQ Technology platform.
 
 Advantages of using Piper:
 * Simplifies process of deploying Queue on Uppmax
-* Has predifined workflows for many common NGS applications (WGS, exome, RNA read counts and differential expression)
-* Has predifined build blocks for running some common NGS tasks such as aligments, variant calling, etc.
+* Has predefined workflows for many common NGS applications (WGS, exome, RNA read counts and differential expression)
+* Has predefined build blocks for running some common NGS tasks such as alignments, variant calling, etc.
 
 Writing your first queue script
 -------------------------------
 
-Start by getting Piper and installing from github:
+Start by getting Piper and installing from Github:
     
     git clone https://github.com/johandahlberg/piper.git
     cd piper
@@ -200,7 +204,7 @@ This will create the files necessary to import the project into the Scala-IDE.
 
 Running it locally
 ------------------
-To run you new QScript locally go into the Piper folder and run the following (with any setup you prefer:
+To run you new QScript locally go into the Piper folder and run the following (with any setup you prefer):
 
     ./piper -S <path to your script> <all other parameters> --job_runner Shell
 
@@ -275,7 +279,7 @@ Running it on Uppmax
 
 [Need to login in on a interactive node - need to be able to run Java]
 
-To run a qscript you need to he vthe slurm-drmaa libraries on your library path. To get this run the following:
+To run a qscript you need to add the the slurm-drmaa libraries on your library path. To get this run the following:
 
     export LD_LIBRARY_PATH=/sw/apps/build/slurm-drmaa/1.0.6/lib/:$LD_LIBRARY_PATH
 
