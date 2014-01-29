@@ -93,7 +93,7 @@ Some of the advantages of using Queue are:
 * Excellent support for the GATK suite
 * Relatively simple to add new components to a pipeline
 
-*Qscripts*</br>
+**Qscripts**<br/>
 The qscript is at the heart of Queue. It's were you define how your pipeline is going to run.  It's written in Scala with some syntactic sugar. In your qscript you will add Command line functions to a dependency graph which will be run by Queue.
 
 Formally a QScript is a class which extends `QScript` and that defines the function `script()`. Furthermore it will typically define (or import) a number of CommandLineFunction and define a have a number of arguments which can be passed to it when running it from the commandline.
@@ -116,7 +116,7 @@ Here's a tiny example of what a QScript can look like:
         }
     }
 
-*CommandLineFunction*</br>
+**CommandLineFunction**<br/>
 If qscripts are the heart of Queue, CommandLineFunctions are it's blood. A CommandLineFunction constructs the actual commands to be run. Each program that is run by Queue is defined as a case class extending the CommandLineFunction class. It defines inputs and outputs, which is how Queue knows how to chain the jobs together into a dependency graph.
 
 Formally a CommandLineFunction is a class which extends the `CommandLineFunction` class and which defines the `commandline` function. Here's an example which finds runs a simple *nix oneliner to find the number of occurrences of each sequence in a fasta file.
@@ -129,7 +129,7 @@ Formally a CommandLineFunction is a class which extends the `CommandLineFunction
 
 The gist is, anything you can run on the commandline you can run with Queue.
 
-*Put it together using add()*</br>
+**Put it together using add()**<br/>
 The key to putting the two things above together is using the `add()` function. This is is how you define what jobs are to be added to the dependency graph and run by Queue. An example of this:
 
     package molmed.qscripts
@@ -183,39 +183,21 @@ Advantages of using Piper:
 * Has predefined workflows for many common NGS applications (WGS, exome, RNA read counts and differential expression)
 * Has predefined build blocks for running some common NGS tasks such as alignments, variant calling, etc.
 
-Writing your first queue script
--------------------------------
-
-Start by getting Piper and installing from Github:
-    
-    git clone https://github.com/johandahlberg/piper.git
-    cd piper
-    git checkout devel
-    ./setup.sh
-
-If you are using Scala-IDE for your development you can create a eclipse project to import by typing:
-
-    sbt/bin/sbt eclipse
-    
-This will create the files necessary to import the project into the Scala-IDE. 
-
-[More on how to write the QScript]
-[Remember that the script needs to extend Uppmaxable to be able to run on Uppmax]
-
 Running it locally
 ------------------
 To run you new QScript locally go into the Piper folder and run the following (with any setup you prefer):
 
     ./piper -S <path to your script> <all other parameters> --job_runner Shell
 
-This will make a dry run of the script. Showing you the commandlines that will be run. To actually execute the jobs, add `-run`:
+This will make a dry run of the script. Showing you the command lines that will be run. To actually execute the jobs, add `-run`:
 
     ./piper -S <path to your script> <all other parameters> --job_runner Shell -run
 
 Running it on Uppmax
 --------------------
-[Something about what changes need to be made to run on Uppmax]
-[THIS IS JUST MY NOTES]
+To run qscripts on Uppmax there are somethings that you need to do. Piper communicates with SLURM using the DRMAA APIs. This means that you need to feed the cluster the required information (such as project id and walltime limit) somehow. The required arguments which are required to be set are collected in the `Uppmaxable` trait in Piper, extending you qscript with this will automatically bring those to you script.
+
+Furthermore you need to specify the resource usage, this is done by wrapping you `CommandLineFunction` case classes in a class which extends the `UppmaxJob`, passing a `UppmaxConfig` instance as a argument. Each `CommandLineFunction` can then specify it's resource usage by extending classes called `OneCoreJob`, `TwoCoreJob`, etc. Sounds difficult? It's not that bad, look at the example below and see for yourself:
 
     package molmed.qscripts
     
@@ -277,16 +259,46 @@ Running it on Uppmax
     
     }
 
-[Need to login in on a interactive node - need to be able to run Java]
+This qscript is now ready to go, and be run on Uppmax. Log in to a node where you're allowed to run java (e.g. a interactive node).
 
 To run a qscript you need to add the the slurm-drmaa libraries on your library path. To get this run the following:
 
     export LD_LIBRARY_PATH=/sw/apps/build/slurm-drmaa/1.0.6/lib/:$LD_LIBRARY_PATH
 
-Dry run:
+You can now dry run the qscript using something like this:
 
-    ./piper -S <path to your script> <all other parameters> --job_runner Shell --job_walltime <time to request from cluster in seconds>
+    ./piper -S <path to your script> <all other parameters> --job_runner Drmaa --job_walltime <time to request from cluster in seconds> --project_id <your uppmax project number>
 
+Just as before, the script will not run, but only run through the dependency graph and make sure everything looks okey. Add `--run` to the command line to make it run the jobs, sending them to the cluster.
+
+Writing your first queue script
+-------------------------------
+
+Start by getting Piper and installing from Github:
+    
+    git clone https://github.com/johandahlberg/piper.git
+    cd piper
+    git checkout devel
+    ./setup.sh
+
+If you are using Scala-IDE for your development you can create a eclipse project to import by typing:
+
+    sbt/bin/sbt eclipse
+    
+This will create the files necessary to import the project into the Scala-IDE. 
+
+**Add a command line function**<br/>
+Starting from the example script above, we are now going to add a example command line which will count the number of occurrences of each base in the fasta file. The original command line will look something like this:
+
+    cat  [your fasta file] | grep -v "^>" | awk 'BEGIN{a=0; c=0; g=0; t=0;} {a+=gsub("A",""); c+=gsub("C",""); g+=gsub("G",""); t+=gsub("T","");} END{print a"\t"c"\t"g"\t"t}' > [some output file]
+
+Create a new file called `MyAwesomeQScript.scala`, and open it in Scala-IDE. Copy the qscript above into the editor and see if you can add the new `CommandLineFunction` to the qscript.
+
+**Adding a InProcessFunction**<br/>
+[TODO]
+
+[More on how to write the QScript]
+[Remember that the script needs to extend Uppmaxable to be able to run on Uppmax]
 
 Troubleshooting
 ---------------
