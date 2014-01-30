@@ -7,10 +7,10 @@ Prerequisites
 -------------
 To follow this workshop you need to have the following programs installed:
 
-    git
-    sun-java 1.7
-    ant
-    [scala-ide](http://scala-ide.org/index.html) (optional - though it will make Scala coding a lot simpler)
+* [git](http://git-scm.com/)
+* [oracle jdk 1.7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
+* [ant](http://ant.apache.org/)
+* [scala-ide](http://scala-ide.org/index.html) (optional - though it will make Scala coding a lot simpler)
     
 If you want to be able to test run things on Uppmax you will also need a uppmax account.
 
