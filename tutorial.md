@@ -1,7 +1,7 @@
-Queue/Piper workshop [insert date]
+Queue/Piper workshop 31/1 2014
 ==================================
 
-This document contains a small tutorial for the Queue/Piper workshop on [insert date]. The idea is to have a small workshop about Queue/Piper, going through the basics of how Queue/Piper works and getting some hands on experience in writing qscripts.
+This document contains a small tutorial for the Queue/Piper workshop on 31/1 2014. The idea is to have a small workshop about Queue/Piper, going through the basics of how Queue/Piper works and getting some hands on experience in writing qscripts.
 
 Prerequisites
 -------------
