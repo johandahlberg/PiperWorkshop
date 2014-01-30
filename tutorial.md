@@ -119,8 +119,8 @@ If you want to learn more about Scala (and read better tutorials than this one) 
 **Queue** <br/>
 [Queue](http://www.broadinstitute.org/gatk/guide/topic?name=queue) is a framework for writing pipelines developed by the Broad and is released under a MIT licence. Queue is built in Scala and contains a few core concepts which will be covered below. Only the basics will be covered here. For more you material, here are some useful resources:
 
-http://www.broadinstitute.org/gatk/guide/events?id=3391
-http://www.broadinstitute.org/gatk/guide/topic?name=queue
+* http://www.broadinstitute.org/gatk/guide/events?id=3391
+* http://www.broadinstitute.org/gatk/guide/topic?name=queue
 
 Some of the advantages of using Queue are:
 * Parallelize workflows
