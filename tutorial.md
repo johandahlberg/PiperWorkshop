@@ -346,11 +346,45 @@ See if you can use this method to run your CommandLineFunctions on all all the f
 
 
 **Adding a InProcessFunction**<br/>
-A `InProcessFunction` is a function which ....
-[TODO]
+A `InProcessFunction` is a function which not run as a command line, but Queue runs as it would run any other Scala function, but based one the inputs and output it will know when in the workflow to run it.
 
-[More on how to write the QScript]
-[Remember that the script needs to extend Uppmaxable to be able to run on Uppmax]
+Creating a `InProcessFunction` is done by extending the `InProcessFunction` trait, and implementing a function called `run()` within the new class, containing the code you want to run.
+
+Now, let's create a new case class called `CreateReport`, which has the following inputs:
+
+* totalNumberOfReadsFile: File
+* sequenceCountsFile: File
+* baseCountsFile: File
+
+And outputs:
+
+* report: File
+
+This should run the following code to compile a very simplistic report:
+
+      val writer = new PrintWriter(report)
+
+      val totalNumberOfReads = Source.fromFile(totalNumberOfReadsFile).getLines.mkString
+      writer.println("Total number of reads: " + totalNumberOfReads)
+
+      writer.println(List("A", "C", "G", "T").mkString("\t"))
+      val baseCounts = Source.fromFile(baseCountsFile).mkString
+      writer.println(baseCounts)
+
+      writer.println("List of the 10 most common sequences:")
+      val sequenceCounts = Source.fromFile(sequenceCountsFile).getLines.take(10)
+      writer.println(sequenceCounts.mkString("\n"))
+
+      writer.close()
+
+Write the class, and see if you can add it to you workflow.
+
+If there is time
+-----------------
+* See if you can implement some workflow that you normally use in Queue/Piper.
+* Explore the existing qscripts to see some more advance examples. `DNABestPracticeVariantCalling` might be a good place to start since it implements a well recognized workflow of "bwa" -> "GATK best practice data processing" -> "variant calling".
+
 
 Troubleshooting
 ---------------
+* Need a import but don't know it's namespace? `ctrl + space` in Scala-IDE will give you a list of suggestions. Selecting one will auto-complete and import the necessary class.
