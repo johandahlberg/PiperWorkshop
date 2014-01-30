@@ -388,3 +388,4 @@ If there is time
 Troubleshooting
 ---------------
 * Need a import but don't know it's namespace? `ctrl + space` in Scala-IDE will give you a list of suggestions. Selecting one will auto-complete and import the necessary class.
+* If you have ant 1.9.3 installed (which is the default version in e.g. Ubuntu 13.10) you need to revert to a earlier version. I used the .deb file found here: https://launchpad.net/ubuntu/+source/ant
