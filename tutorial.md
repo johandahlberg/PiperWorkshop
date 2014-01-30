@@ -1,7 +1,7 @@
 Queue/Piper workshop [insert date]
 ==================================
 
-This document contains a small tutorial for the Piper workshop on [insert date]. The idea is to have a small workshop about Queue/Piper, going through the basics of how Queue/Piper works and getting some hands on experience in writing qscripts.
+This document contains a small tutorial for the Queue/Piper workshop on [insert date]. The idea is to have a small workshop about Queue/Piper, going through the basics of how Queue/Piper works and getting some hands on experience in writing qscripts.
 
 Prerequisites
 ------------------
@@ -18,8 +18,7 @@ Introductions
 ------------------
 The text below might contain some jargon which is unfamiliar to you. Try not to get stuck, but move on and hopefully it all will be clearer once you've started working with it in practice.
 
-**A very brief introduction to Scala**
-
+**A very brief introduction to Scala**<br/>
 It will of course be impossible to cover everything in the Scala language here, and there are plenty of resources on the net which you can look through if you are interested. This will be a very brief introduction hopefully containing enough to allow you to start writing qscripts. 
 
 Scala is a object oriented cross-paradigm language which compiles to java byte code and runs on the Java Virtual Machine. To access the full power of Scala one should program in a functional style, but it's absolutely possible to write imperative style code in scala. 
@@ -74,8 +73,22 @@ Scala is very similary to Java, so if you've worked with Java before you should 
             def pong: String = "Ping"
         }
 
-**Scala resources**
+    // Using for-constructs in scala
+    val sequence = Seq(1, 2, 3, 4)
+    
+    // Classical iteration
+    for (elem <- sequence) {
+        println("elem: " + elem)
+    }
+    
+    // Using a for-comprehension to generate a new sequence
+    val newSequence = 
+        for (elem <- sequence) yield {
+            elem + 1
+        }
+    
 
+**Scala resources** <br/>
 If you want to learn more about Scala (and read better tutorials than this one) have a look in some of these places:
 
 * http://www.scala-lang.org
@@ -202,7 +215,7 @@ This will make a dry run of the script. Showing you the command lines that will 
 
 Running it on Uppmax
 --------------------
-To run qscripts on Uppmax there are somethings that you need to do. Piper communicates with SLURM using the DRMAA APIs. This means that you need to feed the cluster the required information (such as project id and walltime limit) somehow. The required arguments which are required to be set are collected in the `Uppmaxable` trait in Piper, extending you qscript with this will automatically bring those to you script.
+To run qscripts on Uppmax there are somethings that you need to do. Piper communicates with SLURM using the DRMAA APIs. This means that you need to feed the cluster the required information (such as project id and walltime limit) somehow. The required arguments which are required to be set are collected in the `Uppmaxable` trait in Piper, extending you qscript with this will automatically bring those to your script.
 
 Furthermore you need to specify the resource usage, this is done by wrapping you `CommandLineFunction` case classes in a class which extends the `UppmaxJob`, passing a `UppmaxConfig` instance as a argument. Each `CommandLineFunction` can then specify it's resource usage by extending classes called `OneCoreJob`, `TwoCoreJob`, etc. Sounds difficult? It's not that bad, look at the example below and see for yourself:
 
@@ -299,7 +312,22 @@ Starting from the example script above, we are now going to add a example comman
 
     cat  [your fasta file] | grep -v "^>" | awk 'BEGIN{a=0; c=0; g=0; t=0;} {a+=gsub("A",""); c+=gsub("C",""); g+=gsub("G",""); t+=gsub("T","");} END{print a"\t"c"\t"g"\t"t}' > [some output file]
 
-Create a new file called `MyAwesomeQScript.scala`, and open it in Scala-IDE. Copy the qscript above into the editor and see if you can add the new `CommandLineFunction` to the qscript.
+Create a new file called `MyAwesomeQScript.scala`, and open it in Scala-IDE. Copy the qscript above into the editor and see if you can add the new `CommandLineFunction` to the qscript. When you've
+
+**Process more than one file**<br/>
+In the example above we have so far only processed one file - in real life that's seldom the case. One way to allow multiple input files of the same type is to use import:
+
+    import org.broadinstitute.sting.queue.util.QScriptUtils
+    
+And use a construct like this:    
+
+    val fastaFiles = QScriptUtils.createSeqFromFile(input)
+    for(fastaFile <- fastaFiles) {
+        // Do something with the files
+    }
+
+See if you can use this method to run your CommandLineFunctions on all all the fasta files in the test data directory.
+
 
 **Adding a InProcessFunction**<br/>
 [TODO]
