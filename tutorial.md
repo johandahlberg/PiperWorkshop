@@ -41,7 +41,7 @@ If you want to try out the examples below the simplest way to do so (provided th
 When the console opens type `console` to initiate the Scala REPL. You can then type all the commands below and see them evaluate:
 
     
-    // Declaring a immutable variable in Scala
+    // Declaring an immutable variable in Scala
     val x = 1
     
     // Declaring a mutable variable (should only be used when it's really needed)
@@ -155,7 +155,7 @@ Here's a tiny example of what a QScript can look like:
 **CommandLineFunction**<br/>
 If qscripts are the heart of Queue, CommandLineFunctions are it's blood. A CommandLineFunction constructs the actual commands to be run. Each program that is run by Queue is defined as a case class extending the CommandLineFunction class. It defines inputs and outputs, which is how Queue knows how to chain the jobs together into a dependency graph.
 
-Formally a CommandLineFunction is a class which extends the `CommandLineFunction` class and which defines the `commandline` function. Here's an example which finds runs a simple *nix oneliner to find the number of occurrences of each sequence in a fasta file.
+Formally a CommandLineFunction is a class which extends the `CommandLineFunction` class and which defines the `commandline` function. Here's an example which runs a simple *nix oneliner to find the number of occurrences of each sequence in a fasta file.
 
     case class NaiveSequenceCounter(@Input fastaFile: File, @Output sequenceCounts: File) extends CommandLineFunction {
         def commandLine = "cat " + fastaFile + 
@@ -305,7 +305,7 @@ You can now dry run the qscript using something like this:
 
     ./piper -S <path to your script> <all other parameters> --job_runner Drmaa --job_walltime <time to request from cluster in seconds> --project_id <your uppmax project number>
 
-Just as before, the script will not run, but only run through the dependency graph and make sure everything looks okey. Add `--run` to the command line to make it run the jobs, sending them to the cluster.
+Just as before, the script will not run, only create the dependency graph and make sure everything looks okey. Add `--run` to the command line to make it run the jobs, sending them to the cluster.
 
 Writing your first queue script
 -------------------------------
@@ -324,11 +324,11 @@ If you are using Scala-IDE for your development you can create a eclipse project
 This will create the files necessary to import the project into the Scala-IDE. 
 
 **Add a command line function** <br/>
-Starting from the example script above, we are now going to add a example command line which will count the number of occurrences of each base in the fasta file. The original command line will look something like this:
+Starting from the example script above, we are now going to add an example command line which will count the number of occurrences of each base in the fasta file. The original command line will look something like this:
 
     cat  [your fasta file] | grep -v "^>" | awk 'BEGIN{a=0; c=0; g=0; t=0;} {a+=gsub("A",""); c+=gsub("C",""); g+=gsub("G",""); t+=gsub("T","");} END{print a"\t"c"\t"g"\t"t}' > [some output file]
 
-Create a new file called `MyAwesomeQScript.scala`, and open it in Scala-IDE. Copy the qscript above into the editor and see if you can add the new `CommandLineFunction` to the qscript. When you've
+Create a new file called `MyAwesomeQScript.scala`, and open it in Scala-IDE. Copy the qscript above into the editor and see if you can add the new `CommandLineFunction` to the qscript. When you've done so, try to run it, as above.
 
 **Process more than one file**<br/>
 In the example above we have so far only processed one file - in real life that's seldom the case. One way to allow multiple input files of the same type is to use import:
@@ -342,11 +342,11 @@ And use a construct like this:
         // Do something with the files
     }
 
-See if you can use this method to run your CommandLineFunctions on all all the fasta files in the test data directory. A tip is that since Queue uses file names to build the dependency graph you need to make sure each output file gets a unique file name.
+See if you can use this method to run your CommandLineFunctions on all the fasta files in the test data directory. A tip is that since Queue uses file names to build the dependency graph you need to make sure each output file gets a unique file name.
 
 
 **Adding a InProcessFunction**<br/>
-A `InProcessFunction` is a function which not run as a command line, but Queue runs as it would run any other Scala function, but based on the inputs and output it will know when in the workflow to run it.
+A `InProcessFunction` is a function which will not run as a command line, but Queue runs it as it would run any other Scala function, but based on the inputs and output it will know when in the workflow to run it.
 
 Creating a `InProcessFunction` is done by extending the `InProcessFunction` trait, and implementing a function called `run()` within the new class, containing the code you want to run.
 
@@ -377,15 +377,15 @@ This should run the following code to compile a very simplistic report:
 
       writer.close()
 
-Create the class, including a definition of the `run()` function and see if you can add it to you workflow.
+Create the class, including a definition of the `run()` function and see if you can add it to your workflow.
 
 If there is time
 -----------------
 * See if you can implement some workflow that you normally use in Queue/Piper.
-* Explore the existing qscripts to see some more advance examples. `DNABestPracticeVariantCalling` might be a good place to start since it implements a well recognized workflow of "bwa" -> "GATK best practice data processing" -> "variant calling".
+* Explore the existing qscripts to see some more advanced examples. `DNABestPracticeVariantCalling` might be a good place to start since it implements a well recognized workflow of "bwa" -> "GATK best practice data processing" -> "variant calling".
 
 
 Troubleshooting
 ---------------
-* Need a import but don't know it's namespace? `ctrl + space` in Scala-IDE will give you a list of suggestions. Selecting one will auto-complete and import the necessary class.
-* If you have ant 1.9.3 installed (which is the default version in e.g. Ubuntu 13.10) you need to revert to a earlier version. I used the .deb file found here: https://launchpad.net/ubuntu/+source/ant
+* Need an import but don't know it's namespace? `ctrl + space` in Scala-IDE will give you a list of suggestions. Selecting one will auto-complete and import the necessary class.
+* If you have `ant 1.9.3` installed (which is the default version in e.g. Ubuntu 13.10) you need to revert to an earlier version. I used the .deb file found here: https://launchpad.net/ubuntu/+source/ant
