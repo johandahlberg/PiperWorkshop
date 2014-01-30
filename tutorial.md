@@ -157,7 +157,7 @@ If qscripts are the heart of Queue, CommandLineFunctions are it's blood. A Comma
 
 Formally a CommandLineFunction is a class which extends the `CommandLineFunction` class and which defines the `commandline` function. Here's an example which finds runs a simple *nix oneliner to find the number of occurrences of each sequence in a fasta file.
 
-    case clase NaiveSequenceCounter(@Input fastaFile: File, @Output sequenceCounts: File) extends CommandLineFunction {
+    case class NaiveSequenceCounter(@Input fastaFile: File, @Output sequenceCounts: File) extends CommandLineFunction {
         def commandLine = "cat " + fastaFile + 
                           " | grep -v \"^>\" | sort | uniq -c >" +
                           sequenceCounts
