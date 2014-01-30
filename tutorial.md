@@ -217,7 +217,7 @@ Piper is build on top of Queue, and is basically a extension of Queue which allo
 Advantages of using Piper:
 * Simplifies process of deploying Queue on Uppmax
 * Has predefined workflows for many common NGS applications (WGS, exome, RNA read counts and differential expression)
-* Has predefined build blocks for running some common NGS tasks such as alignments, variant calling, etc.
+* Has predefined building blocks for running some common NGS tasks such as alignments, variant calling, etc.
 
 Running it locally
 ------------------
