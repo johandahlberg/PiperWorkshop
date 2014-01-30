@@ -4,7 +4,7 @@ Queue/Piper workshop [insert date]
 This document contains a small tutorial for the Queue/Piper workshop on [insert date]. The idea is to have a small workshop about Queue/Piper, going through the basics of how Queue/Piper works and getting some hands on experience in writing qscripts.
 
 Prerequisites
-------------------
+-------------
 To follow this workshop you need to have the following programs installed:
 
     git
@@ -13,6 +13,15 @@ To follow this workshop you need to have the following programs installed:
     [scala-ide](http://scala-ide.org/index.html) (optional - though it will make Scala coding a lot simpler)
     
 If you want to be able to test run things on Uppmax you will also need a uppmax account.
+
+Running the examples below
+--------------------------
+To be able to test run the things presented below you need to install Piper:
+
+    git clone https://github.com/johandahlberg/piper.git
+    cd piper
+    git checkout devel
+    ./setup.sh
 
 Introductions
 ------------------
@@ -24,6 +33,13 @@ It will of course be impossible to cover everything in the Scala language here, 
 Scala is a object oriented cross-paradigm language which compiles to java byte code and runs on the Java Virtual Machine. To access the full power of Scala one should program in a functional style, but it's absolutely possible to write imperative style code in scala. 
 
 Scala is very similary to Java, so if you've worked with Java before you should be able to jump straight into it.
+
+If you want to try out the examples below the simplest way to do so (provided that you have downloaded and setup Piper) is to run `sbt` from the Piper directory using:
+
+    sbt/bin/sbt
+    
+When the console opens type `console` to initiate the Scala REPL. You can then type all the commands below and see them evaluate:
+
     
     // Declaring a immutable variable in Scala
     val x = 1
@@ -294,7 +310,7 @@ Just as before, the script will not run, but only run through the dependency gra
 Writing your first queue script
 -------------------------------
 
-Start by getting Piper and installing from Github:
+Start by getting Piper and installing from Github (if you did this in the begining, you can skip it now):
     
     git clone https://github.com/johandahlberg/piper.git
     cd piper
@@ -326,10 +342,11 @@ And use a construct like this:
         // Do something with the files
     }
 
-See if you can use this method to run your CommandLineFunctions on all all the fasta files in the test data directory.
+See if you can use this method to run your CommandLineFunctions on all all the fasta files in the test data directory. A tip is that since Queue uses file names to build the dependency graph you need to make sure each output file gets a unique file name.
 
 
 **Adding a InProcessFunction**<br/>
+A `InProcessFunction` is a function which ....
 [TODO]
 
 [More on how to write the QScript]
