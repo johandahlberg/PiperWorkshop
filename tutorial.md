@@ -78,7 +78,14 @@ Scala is very similary to Java, so if you've worked with Java before you should 
 
 If you want to learn more about Scala (and read better tutorials than this one) have a look in some of these places:
 
-[INSERT LIST OF LINKS]
+* http://www.scala-lang.org
+* http://twitter.github.io/scala_school/
+* http://stackoverflow.com/tags/scala/info
+* http://aperiodic.net/phil/scala/s-99/
+* http://programming-scala.labs.oreilly.com
+* http://www.scala-lang.org/docu/files/ScalaByExample.pdf
+* http://devcheatsheet.com/tag/scala/
+* http://davetron5000.github.com/scala-style/index.html
 
 **Queue** <br/>
 [Queue](http://www.broadinstitute.org/gatk/guide/topic?name=queue) is a framework for writing pipelines developed by the Broad and is released under a MIT licence. Queue is built in Scala and contains a few core concepts which will be covered below. Only the basics will be covered here. For more you material, here are some useful resources:
