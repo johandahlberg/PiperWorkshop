@@ -47,29 +47,29 @@ When the console opens type `console` to initiate the Scala REPL. You can then t
     // Declaring a mutable variable (should only be used when it's really needed)
     var y = "a"
     y = "b"
-
-    // Scala is a strongly type language with type inference. That means that the compiler will figure out types for you depending on the context. This means that the following is illegal:  
+    
+    // Scala is a strongly type language with type inference. That means that the compiler will figure out types for you depending on the context. This means that the following is illegal:
     y = 1 // y has type String, and 1 has type Int (in this case). This will not compile.
-
+    
     // Declare a class
-    class MyAwesomeClass(x: Int, s: String) { // Parameters are optional. 
-        // Class body
+    class MyAwesomeClass(x: Int, s: String) { // Parameters are optional.
+    // Class body
     }
     
     // Declare a case class (a special type of class which where natural equals methods are auto generated, and that can be use to do pattern matching.
     case class Point(x: Int, y: Int)
     
     // This means that the following will return true (which it would not do in Java without writing a custom equals method.
-    Point(1,1) == Point(1,1)
+    Point(1, 1) == Point(1, 1)
     
     // As Scala is a functional language, so functions are at the hearth of it. Here is how you declare a very simple one:
     def square(x: Int): Int = x * x
     
     // A slightly more complex example is:
     def squareThanSum(x: List[Int]): Int = {
-        val squared = x.map(y => y * y) // Square each element in the list
-        val summed = squared.reduce((y,z) => y + z) // And sum the elements
-        summed // The last line in the function is returned
+    val squared = x.map(y => y * y) // Square each element in the list
+    val summed = squared.reduce((y, z) => y + z) // And sum the elements
+    summed // The last line in the function is returned
     }
     
     // Extending a class:
@@ -78,30 +78,29 @@ When the console opens type `console` to initiate the Scala REPL. You can then t
     
     // Scala also has something called traits (similar to interfaces in Java). A class can only inherit one class, but it can implement multiple traits. They can contain implemented fields and functions, or unimplemented ones (this will force the implementing class to provide a implementation).
     trait Pingable {
-        def ping: String = "Pong"
-        def pong: String
+    def ping: String = "Pong"
+    def pong: String
     }
     
     // Traits are added to classes using the "with" key-word.
-    class TwoDimensionalPoint(color: String, x: Int, y: Int) 
-        extends ColoredPoint(color)
-        with Pingable {
-            def pong: String = "Ping"
-        }
-
+    class TwoDimensionalPoint(color: String, x: Int, y: Int)
+    extends ColoredPoint(color)
+    with Pingable {
+    def pong: String = "Ping"
+    }
+    
     // Using for-constructs in scala
     val sequence = Seq(1, 2, 3, 4)
     
     // Classical iteration
     for (elem <- sequence) {
-        println("elem: " + elem)
+    println("elem: " + elem)
     }
     
     // Using a for-comprehension to generate a new sequence
-    val newSequence = 
-        for (elem <- sequence) yield {
-            elem + 1
-        }
+    val newSequence: Seq[Int] =
+    for (elem <- sequence) yield elem + 1
+
     
 
 **Scala resources** <br/>
