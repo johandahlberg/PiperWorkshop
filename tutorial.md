@@ -62,7 +62,7 @@ When the console opens type `console` to initiate the Scala REPL. You can then t
     // This means that the following will return true (which it would not do in Java without writing a custom equals method.
     Point(1, 1) == Point(1, 1)
     
-    // As Scala is a functional language, so functions are at the hearth of it. Here is how you declare a very simple one:
+    // As Scala is a functional language, so functions are at the heart of it. Here is how you declare a very simple one:
     def square(x: Int): Int = x * x
     
     // A slightly more complex example is:
