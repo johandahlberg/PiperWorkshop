@@ -296,10 +296,6 @@ This should run the following code to compile a very simplistic report:
       val totalNumberOfReads = Source.fromFile(totalNumberOfReadsFile).getLines.mkString
       writer.println("Total number of reads: " + totalNumberOfReads)
 
-      writer.println(List("A", "C", "G", "T").mkString("\t"))
-      val baseCounts = Source.fromFile(baseCountsFile).mkString
-      writer.println(baseCounts)
-
       writer.println("List of the 10 most common sequences:")
       val sequenceCounts = Source.fromFile(sequenceCountsFile).getLines.take(10)
       writer.println(sequenceCounts.mkString("\n"))
@@ -310,4 +306,9 @@ This should run the following code to compile a very simplistic report:
 *Exercise 7*<br/>
 Create the class, including a definition of the `run()` function and see if you can add it to your workflow.
 
+**Putting it all together**<br/>
+Armed with the tools you've got so far - can you create a script which will count the number of occurences of base base (A, C, T, G) in the sequence parts of the fasta files, add this as another commandline tool, and add that information to the report? Use any tools you see fit to do the base counting.
+
 Congratulations, you've now finished this tutorial!
+
+
