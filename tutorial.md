@@ -258,13 +258,21 @@ In the example above we have so far only processed one file - in real life that'
     
 And use a construct like this:    
 
-    val fastaFiles = QScriptUtils.createSeqFromFile(input)
+    val fastaFiles: Seq[File] = QScriptUtils.createSeqFromFile(input)
     for(fastaFile <- fastaFiles) {
         // Do something with the files
     }
 
+This allows you to input a file with a list of files (one per line) to run.
+
+Alternatively you can change your input argument to:
+
+    var input: Seq[File] = Nil
+
+Then you can specify `-i` on the commandline multiple times. 
+
 *Exercise 6*<br/>
-See if you can use this method to run your CommandLineFunctions on all the fasta files in the test data directory. A tip is that since Queue uses file names to build the dependency graph you need to make sure each output file gets a unique file name.
+See if you can use either of these methods to run your CommandLineFunctions on all the fasta files in the test data directory. A tip is that since Queue uses file names to build the dependency graph you need to make sure each output file gets a unique file name.
 
 **Adding a InProcessFunction**<br/>
 A `InProcessFunction` is a function which will not run as a command line, but Queue runs it as it would run any other Scala function, but based on the inputs and output it will know when in the workflow to run it.
