@@ -10,7 +10,7 @@ This document contains the material for the Queue/Piper workshop given at e-Infr
 * Run it in distributed mode
 
 **What is Queue?** <br/>
-[Queue](http://www.broadinstitute.org/gatk/guide/topic?name=queue) is a framework for writing pipelines developed by the GATK group at the Broad Institure and is released under a MIT licence. Queue is built in Scala and contains a few core concepts which will be covered below. Only the basics will be covered here. For more you material, here are some useful resources:
+[Queue](http://www.broadinstitute.org/gatk/guide/topic?name=queue) is a framework for writing pipelines developed by the GATK group at the Broad Institure and is released under a MIT licence. Queue is built in Scala and contains a few core concepts which will be covered below. Only the basics will be covered here. For more material, here are some useful resources:
 
 * http://www.broadinstitute.org/gatk/guide/events?id=3391
 * http://www.broadinstitute.org/gatk/guide/topic?name=queue
@@ -23,10 +23,10 @@ Some of the advantages of using Queue are:
 * Relatively simple to add new components to a pipeline
 
 **What is Piper?** <br/>
-Piper is a collection of common NGS workflows implemented on-top of Queue and to run on the Uppmax high-performance computing cluster. It supports things like variant callng in whole genome and targeted methods, and transcript quantifications for RNA-seq data. This workshop will focus on Queue since this of more general interest. 
+Piper is a collection of common NGS workflows implemented on-top of Queue and to run on the Uppmax high-performance computing cluster. It supports things like variant calling in whole genome and targeted DNA-seq, and transcript quantifications for RNA-seq data. This workshop will focus on Queue since this of more general interest. 
 
 **Finding help** <br/>
-If you get stuck (and your at the actual workshop) don't hesitate to ask me. Lacking that, or if your doing this on your own you can find a complete examples which covers everything in this workshop in the `solutions` directory in this repository.
+If you get stuck (and your at the actual workshop) don't hesitate to ask me. If your doing this on your own you can find examples covering everything in this workshop in the `solutions` directory in this repository.
 
 Getting started
 ---------------
@@ -43,7 +43,7 @@ To make sure you have the latest version of this tutorial available in the VM do
     cd ~/Desktop/PiperWorkshop
     git pull origin
 
-To keep things simple `vim` has been installed on the VM. Additionally ScalaIDE has been installed (/home/piper/Bin/eclipse/eclipse), though that might be somwhat sluggish on a limited resources VM. Want to use another editor, feel free to install it (you do have sudo privileges on the VM).
+To keep things simple `vim` has been installed on the VM. Additionally ScalaIDE has been installed (/home/piper/Bin/eclipse/eclipse), though that might be somewhat sluggish on a limited resources VM. Want to use another editor, feel free to install it (you do have sudo privileges on the VM).
 
 Part 0: A super quick intro to Scala
 ------------------------------------
@@ -140,7 +140,7 @@ Part 1: The basic concepts
 **Qscripts**<br/>
 The qscript is at the heart of Queue. It's were you define how your pipeline is going to run. The basic concept is that programs are chained together based on their inputs and outputs to create a dependency graph. Queue the uses this to determine the order in which the programs can be run and execute the accordingly. Formally a QScript is a class which extends `QScript` and that defines the function `script()`.
 
-Here's a tiny example of what a QScript can look like (rich with comments to explain the different parts):
+Here's a tiny example of what a QScript can look like:
 
     // The namespace in which this QScript exits
     package example.qscripts
@@ -163,7 +163,7 @@ Here's a tiny example of what a QScript can look like (rich with comments to exp
     }
 
 *Exercise 2*<br/>
-Create a file called `MyAwesomeQScript.scala` and insert the code above into it. Then try: `piper -S MyAwesomeQScript.scala --help`. This will show you all the general options for Queue (there are lots of them) and the specific to this QScript.
+Create a file called `MyAwesomeQScript.scala` and insert the code above into it. Then try: `piper -S MyAwesomeQScript.scala --help`. This will show you all the general options for Queue (there are lots of them) and the once specific to this QScript.
 
 Try removing the `--help` part. What happens?
 
@@ -183,20 +183,20 @@ The gist is, anything you can run on the commandline you can run with Queue.
 *Exercise 3* <br/>
 Add the code example code above to `MyAwesomeQScript.scala` and add another one command line program with the following specification:
 
-    Input: the output of the previous example.
+    Input: the output of the previous example (a file with counts in 
+           the first column and sequences in the second column).
     Output: a file containing the total number reads in the file
     Commandline suggestion: cat <input file> | awk '{sum=sum+$1} END{print sum}' > <output_file>
 
 And then try: `piper -S MyAwesomeQScript.scala --help`. See if you can get it to run without any compile errors.
-    
 
 **Put it together using add()**<br/>
 So far we've not actually had this create any dependency graph. The key to creating the dependency graph is the `add()` function.
 
 *Exercise 4* <br/>
-It's time to get into your script function. Add the output files you want to create and then use the `add()` function to add your jobs to the dependency graph.
+It's time to get into your `script()` function. Add the output files you want to create and then use the `add()` function to add your jobs to the dependency graph.
 
-    def script() {
+    def script() = {
     
         // Defining names of output files
         val seqCounts = new File("sequence_counts.txt")
@@ -236,7 +236,7 @@ What happens if you run `piper -S MyAwesomeQScript.scala -i test_data/test1.fast
 Part 3: Make it distributed
 ---------------------------
 
-Well running your jobs is cool, but running something in distrubuted mode is way cooler. The default "jobrunner" in Queue is the Shell jobrunner. By switching job runners you can make Queue run your jobs in a distrubuted fashion. The VM has a simulated Slurm environment setup for this purpose.
+Well running your jobs is cool, but running something in distributed mode is way cooler. The default "jobrunner" in Queue is the Shell jobrunner. By switching job runners you can make Queue run your jobs in a distributed fashion. The VM has a simulated Slurm environment setup for this purpose.
 
 *Exercise 6*<br/>
 
@@ -246,13 +246,13 @@ Well running your jobs is cool, but running something in distrubuted mode is way
 
 You should now see that the DrmaaJobRunner submits jobs. Use the `squeue` command to see the job queue. (You might have to add a `sleep 10` to you commandlines to actually catch them in the Slurm queue, since the example files are so small these jobs will run very fast).
 
-Please note that depending on your specific compute environment adding the `-jobRunner` argument might not be enough. Since the cluster environment might require additional information about the job such as project number to bill hours to etc. Using the `-jobNative` flag can be useful in such circumstances to to feed additional arguments to the cluster environment. Piper provides a number of utility classes to to this on then specific setup of the Uppmax Slurm cluster, and that might work in other environments as well.  
+Please note that depending on your specific compute environment adding the `-jobRunner` argument might not be enough. Since the cluster environment might require additional information about the job such as project number to bill hours to etc. Using the `-jobNative` flag can be useful in such circumstances to to feed additional arguments to the cluster environment. Piper provides a number of utility classes to do this on the specific setup of the Uppmax Slurm cluster, and that might work in other environments as well.  
 
 Part 4: Additional cool things (if time allows)
 -----------------------------------------------
 
 **Running on multiple files**<br/>
-In the example above we have so far only processed one file - in real life that's seldom the case. One way to allow multiple input files of the same type is to use import:
+In the example above we have so far only processed one file - in real life that's seldom the case. One way to allow multiple input files of the same type is to import:
 
     import org.broadinstitute.sting.queue.util.QScriptUtils
     
