@@ -41,7 +41,7 @@ class MyAwesomeQSCript extends QScript {
   }
 
   case class SumTotalNumberOfRead(@Input seqCounts: File, @Output totalNumberOfReads: File) extends CommandLineFunction {
-    def commandLine = "cat " + seqCounts + " | awk '{sum=sum+$1} END{print sum}' > " + totalNumberOfReads + " && sleep 10"
+    def commandLine = "cat " + seqCounts + " | awk '{sum=sum+$1} END{print sum}' > " + totalNumberOfReads
   }
 
 }

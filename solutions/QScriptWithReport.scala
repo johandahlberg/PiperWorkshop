@@ -14,25 +14,19 @@ class MyAwesomeQSCript extends QScript {
 
   def script() = {
 
-    for(inputFile <- input) {
-            
+    for (inputFile <- input) {
+
       val base = inputFile.getName().stripSuffix(".fasta")
 
       val seqCounts = new File(base + "_sequence_counts.txt")
       val totalNumberOfReads = new File(base + "_total_read_nbr.txt")
+      val report = new File(base + "_report.txt")
 
       add(NaiveSequenceCounter(inputFile, seqCounts))
       add(SumTotalNumberOfRead(seqCounts, totalNumberOfReads))
-      add(CreateReport(totalNumberOfReads, sequenceCounts))
+      add(CreateReport(totalNumberOfReads, seqCounts, report))
 
     }
-
-    val seqCounts = new File("sequence_counts.txt")
-    val totalNumberOfReads = new File("total_read_nbr.txt")
-
-    add(NaiveSequenceCounter(input, seqCounts))
-    add(SumTotalNumberOfRead(seqCounts, totalNumberOfReads))
-
   }
 
   case class NaiveSequenceCounter(@Input fastaFile: File, @Output sequenceCounts: File) extends CommandLineFunction {
@@ -42,15 +36,17 @@ class MyAwesomeQSCript extends QScript {
   }
 
   case class SumTotalNumberOfRead(@Input seqCounts: File, @Output totalNumberOfReads: File) extends CommandLineFunction {
-    def commandLine = "cat " + seqCounts + " | awk '{sum=sum+$1} END{print sum}' > " + totalNumberOfReads + " && sleep 10"
+    def commandLine = "cat " + seqCounts + " | awk '{sum=sum+$1} END{print sum}' > " + totalNumberOfReads
   }
 
   case class CreateReport(
-    @Input totalNumberOfReadsFile: File,
-    @Input sequenceCountsFile: File,
-    @Output report: File) extends InProcessFunction {
-      
+      @Input totalNumberOfReadsFile: File,
+      @Input sequenceCountsFile: File,
+      @Output report: File) extends InProcessFunction {
+
     def run() = {
+      import scala.io.Source
+      import java.io.PrintWriter
 
       val writer = new PrintWriter(report)
 
