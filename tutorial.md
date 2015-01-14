@@ -1,50 +1,72 @@
-Queue/Piper workshop 31/1 2014
-==================================
+Queue/Piper workshop at eInfraMPS2015 
+=====================================
 
-This document contains a small tutorial for the Queue/Piper workshop on 31/1 2014. The idea is to have a small workshop about Queue/Piper, going through the basics of how Queue/Piper works and getting some hands on experience in writing qscripts.
+This document contains the material for the Queue/Piper workshop given at e-Infrastructure for [Massively Parallel Sequencing 2015](http://www.uppnex.se/events/eInfraMPS2015). Completing this tutorial should take approximatly one hour. The aim is that once you've completed the tutorial you should:
 
-Prerequisites
--------------
-To follow this workshop you need to have the following programs installed:
+* Understand some basic Scala syntax
+* Understand the basic underlying concepts of GATK Queue
+* Be able to write a simple QScript
+* Run this locally
+* Run it in distributed mode
 
-* [git](http://git-scm.com/)
-* [oracle jdk 1.7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
-* [ant](http://ant.apache.org/) (you need a version from before 1.9.3, since this has a bug in it)
-* [scala-ide](http://scala-ide.org/index.html) (optional - though it will make Scala coding a lot simpler)
-    
-If you want to be able to test run things on Uppmax you will also need a uppmax account.
+**What is Queue?** <br/>
+[Queue](http://www.broadinstitute.org/gatk/guide/topic?name=queue) is a framework for writing pipelines developed by the GATK group at the Broad Institure and is released under a MIT licence. Queue is built in Scala and contains a few core concepts which will be covered below. Only the basics will be covered here. For more you material, here are some useful resources:
 
-Running the examples below
---------------------------
-To be able to test run the things presented below you need to install Piper:
+* http://www.broadinstitute.org/gatk/guide/events?id=3391
+* http://www.broadinstitute.org/gatk/guide/topic?name=queue
 
-    git clone https://github.com/johandahlberg/piper.git
-    cd piper
-    git checkout devel
-    ./setup.sh
+Some of the advantages of using Queue are:
+* Parallelize workflows
+* Supports reruns
+* Possible to create reusable components
+* Excellent support for the GATK suite
+* Relatively simple to add new components to a pipeline
 
-Introductions
-------------------
+**What is Piper?** <br/>
+Piper is a collection of common NGS workflows implemented on-top of Queue and to run on the Uppmax high-performance computing cluster. It supports things like variant callng in whole genome and targeted methods, and transcript quantifications for RNA-seq data. This workshop will focus on Queue since this of more general interest. 
+
+**Finding help** <br/>
+If you get stuck (and your at the actual workshop) don't hesitate to ask me. Lacking that, or if your doing this on your own you can find a complete examples which covers everything in this workshop in the `solutions` directory in this repository.
+
+Getting started
+---------------
+
+The simplest way to get going with this tutorial is to download the following VM and import into e.g. VirtualBox: https://drive.google.com/file/d/0BwX8h-A0AgGIMlhnMHhnZFZLTnM/view?usp=sharing (md5sum: 12610cf6aac8cc74a709a12a4c8511f5). Spin it up and login with:
+
+    username: piper
+    password: workshop
+
+This has all pre-requisites required to run this tutorial installed, including a slurm-installation which allows you to simulate running in a distributed environment. If you want to install Piper for yourself follow the install instructions in the main repo: https://github.com/NationalGenomicsInfrastructure/piper
+
+To make sure you have the latest version of this tutorial available in the VM do this:
+
+    cd ~/Desktop/PiperWorkshop
+    git pull origin
+
+To keep things simple `vim` has been installed on the VM. Additionally ScalaIDE has been installed (/home/piper/Bin/eclipse/eclipse), though that might be somwhat sluggish on a limited resources VM. Want to use another editor, feel free to install it (you do have sudo privileges on the VM).
+
+Part 0: A super quick intro to Scala
+------------------------------------
+
 The text below might contain some jargon which is unfamiliar to you. Try not to get stuck, but move on and hopefully it all will be clearer once you've started working with it in practice.
 
 **A very brief introduction to Scala**<br/>
-It will of course be impossible to cover everything in the Scala language here, and there are plenty of resources on the net which you can look through if you are interested. This will be a very brief introduction hopefully containing enough to allow you to start writing qscripts. 
+Queue is build in Scala, therefore it's useful to have a basic understanding of the language. It will of course be impossible to cover everything in the Scala language here, and there are plenty of resources on the net which you can look through if you are interested. This will be a very brief introduction hopefully containing enough to allow you to start writing qscripts. 
 
-Scala is a object oriented cross-paradigm language which compiles to java byte code and runs on the Java Virtual Machine. To access the full power of Scala one should program in a functional style, but it's absolutely possible to write imperative style code in scala. 
+Scala is a object oriented cross-paradigm language which compiles to java byte code and runs on the Java Virtual Machine. To access the full power of Scala one should program in a functional style, but it's absolutely possible to write imperative style code in scala. Scala is very similary to Java, so if you've worked with Java before you should be able to jump straight into it.
 
-Scala is very similary to Java, so if you've worked with Java before you should be able to jump straight into it.
+*Exercise 1*<br/>
+Start by fireing up `sbt` (Scalas build tool) from the Piper directory using:
 
-If you want to try out the examples below the simplest way to do so (provided that you have downloaded and setup Piper) is to run `sbt` from the Piper directory using:
-
-    sbt/bin/sbt
+    # Assumes you have cd:ed into the workshop dir: ~/Desktop/PiperWorkshop
+    piper/sbt/bin/sbt
     
-When the console opens type `console` to initiate the Scala REPL. You can then type all the commands below and see them evaluate:
-
+When the console opens type `console` to initiate the Scala REPL. You can then type all the commands below and see them evaluate. Play around with it to familiarize yourself with the syntax.
     
     // Declaring an immutable variable in Scala
     val x = 1
     
-    // Declaring a mutable variable (should only be used when it's really needed)
+    // Declaring a mutable variable
     var y = "a"
     y = "b"
     
@@ -59,17 +81,18 @@ When the console opens type `console` to initiate the Scala REPL. You can then t
     // Declare a case class (a special type of class which where natural equals methods are auto generated, and that can be use to do pattern matching.
     case class Point(x: Int, y: Int)
     
-    // This means that the following will return true (which it would not do in Java without writing a custom equals method.
+    // This means that the following will return true (which it would not do in Java without writing a custom equals method).
     Point(1, 1) == Point(1, 1)
     
     // As Scala is a functional language, so functions are at the heart of it. Here is how you declare a very simple one:
     def square(x: Int): Int = x * x
     
-    // A slightly more complex example is:
+    // A slightly more complex example is
+    // Note the use of higher order functions in "map" and "reduce"
     def squareThanSum(x: List[Int]): Int = {
-    val squared = x.map(y => y * y) // Square each element in the list
-    val summed = squared.reduce((y, z) => y + z) // And sum the elements
-    summed // The last line in the function is returned
+        val squared = x.map(y => y * y) // Square each element in the list
+        val summed = squared.reduce((y, z) => y + z) // And sum the elements
+        summed // The last line in the function is returned - no need for a return keyword
     }
     
     // Extending a class:
@@ -78,15 +101,15 @@ When the console opens type `console` to initiate the Scala REPL. You can then t
     
     // Scala also has something called traits (similar to interfaces in Java). A class can only inherit one class, but it can implement multiple traits. They can contain implemented fields and functions, or unimplemented ones (this will force the implementing class to provide a implementation).
     trait Pingable {
-    def ping: String = "Pong"
-    def pong: String
+        def ping: String = "Pong"
+        def pong: String
     }
     
     // Traits are added to classes using the "with" key-word.
     class TwoDimensionalPoint(color: String, x: Int, y: Int)
-    extends ColoredPoint(color)
-    with Pingable {
-    def pong: String = "Ping"
+        extends ColoredPoint(color)
+        with Pingable {
+            def pong: String = "Ping"
     }
     
     // Using for-constructs in scala
@@ -94,14 +117,13 @@ When the console opens type `console` to initiate the Scala REPL. You can then t
     
     // Classical iteration
     for (elem <- sequence) {
-    println("elem: " + elem)
+        println("elem: " + elem)
     }
     
     // Using a for-comprehension to generate a new sequence
     val newSequence: Seq[Int] =
-    for (elem <- sequence) yield elem + 1
+        for (elem <- sequence) yield elem + 1
 
-    
 
 **Scala resources** <br/>
 If you want to learn more about Scala (and read better tutorials than this one) have a look in some of these places:
@@ -110,38 +132,27 @@ If you want to learn more about Scala (and read better tutorials than this one) 
 * http://twitter.github.io/scala_school/
 * http://stackoverflow.com/tags/scala/info
 * http://aperiodic.net/phil/scala/s-99/
-* http://programming-scala.labs.oreilly.com
 * http://www.scala-lang.org/docu/files/ScalaByExample.pdf
-* http://devcheatsheet.com/tag/scala/
-* http://davetron5000.github.com/scala-style/index.html
 
-**Queue** <br/>
-[Queue](http://www.broadinstitute.org/gatk/guide/topic?name=queue) is a framework for writing pipelines developed by the Broad and is released under a MIT licence. Queue is built in Scala and contains a few core concepts which will be covered below. Only the basics will be covered here. For more you material, here are some useful resources:
-
-* http://www.broadinstitute.org/gatk/guide/events?id=3391
-* http://www.broadinstitute.org/gatk/guide/topic?name=queue
-
-Some of the advantages of using Queue are:
-* Parallelize workflows
-* Supports reruns
-* Possible to create reusable components
-* Excellent support for the GATK suite
-* Relatively simple to add new components to a pipeline
+Part 1: The basic concepts
+--------------------------
 
 **Qscripts**<br/>
-The qscript is at the heart of Queue. It's were you define how your pipeline is going to run.  It's written in Scala with some syntactic sugar. In your qscript you will add command line functions to a dependency graph which will be run by Queue.
+The qscript is at the heart of Queue. It's were you define how your pipeline is going to run. The basic concept is that programs are chained together based on their inputs and outputs to create a dependency graph. Queue the uses this to determine the order in which the programs can be run and execute the accordingly. Formally a QScript is a class which extends `QScript` and that defines the function `script()`.
 
-Formally a QScript is a class which extends `QScript` and that defines the function `script()`. Furthermore it will typically define (or import) a number of CommandLineFunction and a have a number of arguments which can be passed to it when running it from the commandline.
+Here's a tiny example of what a QScript can look like (rich with comments to explain the different parts):
 
-Here's a tiny example of what a QScript can look like:
-
-    package molmed.qscripts
+    // The namespace in which this QScript exits
+    package example.qscripts
     
-    import org.broadinstitute.sting.queue.QScript
-    
+    // Imports of other classes
+    import org.broadinstitute.gatk.queue.QScript
+   
+    // The class definition of the QScript
     class MyAwesomeQScript extends QScript {
     
-        // A argument that should be passed to the qscript from the command line 
+        // A argument that should be passed to the qscript from the command line
+        // Will also be used to create commandline documentation of the script
         @Input(doc = "input fasta file", shortName = "i", required = true)
         var input: File = _
     
@@ -151,8 +162,13 @@ Here's a tiny example of what a QScript can look like:
         }
     }
 
+*Exercise 2*<br/>
+Create a file called `MyAwesomeQScript.scala` and insert the code above into it. Then try: `piper -S MyAwesomeQScript.scala --help`. This will show you all the general options for Queue (there are lots of them) and the specific to this QScript.
+
+Try removing the `--help` part. What happens?
+
 **CommandLineFunction**<br/>
-If qscripts are the heart of Queue, CommandLineFunctions are it's blood. A CommandLineFunction constructs the actual commands to be run. Each program that is run by Queue is defined as a case class extending the CommandLineFunction class. It defines inputs and outputs, which is how Queue knows how to chain the jobs together into a dependency graph.
+If qscripts are the heart of Queue, CommandLineFunctions are its blood. A CommandLineFunction constructs the actual commands to be run. Each program that is run by Queue is defined as a case class extending the CommandLineFunction class. It defines inputs and outputs, which is how Queue knows how to chain the jobs together into a dependency graph.
 
 Formally a CommandLineFunction is a class which extends the `CommandLineFunction` class and which defines the `commandline` function. Here's an example which runs a simple *nix oneliner to find the number of occurrences of each sequence in a fasta file.
 
@@ -164,23 +180,23 @@ Formally a CommandLineFunction is a class which extends the `CommandLineFunction
 
 The gist is, anything you can run on the commandline you can run with Queue.
 
+*Exercise 3* <br/>
+Add the code example code above to `MyAwesomeQScript.scala` and add another one command line program with the following specification:
+
+    Input: the output of the previous example.
+    Output: a file containing the total number reads in the file
+    Commandline suggestion: cat <input file> | awk '{sum=sum+$1} END{print sum}' > <output_file>
+
+And then try: `piper -S MyAwesomeQScript.scala --help`. See if you can get it to run without any compile errors.
+    
+
 **Put it together using add()**<br/>
-The key to putting the two things above together is using the `add()` function. This is is how you define what jobs are to be added to the dependency graph and run by Queue. An example of this:
+So far we've not actually had this create any dependency graph. The key to creating the dependency graph is the `add()` function.
 
-    package molmed.qscripts
+*Exercise 4* <br/>
+It's time to get into your script function. Add the output files you want to create and then use the `add()` function to add your jobs to the dependency graph.
 
-    import org.broadinstitute.sting.queue.QScript
-    import java.io.File
-    import org.broadinstitute.sting.commandline.Argument
-    
-    class MyAwesomeQScript extends QScript {
-    
-      // An argument that should be passed to the qscript from the commandline 
-      @Input(doc = "input fasta file", shortName = "i", required = true)
-      var input: File = _
-    
-      // Where you define the pipeline
-      def script() {
+    def script() {
     
         // Defining names of output files
         val seqCounts = new File("sequence_counts.txt")
@@ -188,148 +204,54 @@ The key to putting the two things above together is using the `add()` function. 
     
         // Add jobs to dependency graph
         add(NaiveSequenceCounter(input, seqCounts))
-        add(SumTotalNumberOfReads(seqCounts, totalNumberOfReads))
-    
-      }
-    
-      case class SumTotalNumberOfReads(@Input seqCounts: File, @Output totalNumberOfReads: File) extends CommandLineFunction {
-        // Another way to define the commandline
-        def commandLine = required("cat")  + 
-                		  required(seqCounts) +
-        				  required(" |  awk \'{sum=sum+$1} END{print sum}\' >  ", escape = false) +
-        				  required(totalNumberOfReads)
-      }
-    
-      case class NaiveSequenceCounter(@Input fastaFile: File, @Output sequenceCounts: File) extends CommandLineFunction {
-    	// Simplest possible way to define commandline 
-        def commandLine = "cat " + fastaFile +
-          " | grep -v \"^>\" | sort | uniq -c >" +
-          sequenceCounts
-      }
+        //add(YOUR OWN SEQUENCE COUNTER, YOU CREATED IN EXERCISE 3)
     }
 
-Note that it does not matter in which order you `add()`  the functions. It is the chain of input and output files that matter, Queue handles the rest.
+Note that it does not matter in which order you `add()` the functions. It is the chain of input and output files that matter, Queue handles the rest.
 
-**Piper** <br/>
-Piper is build on top of Queue, and is basically a extension of Queue which allows Queue to be run on Uppmax. Furthermore it contains a number of predefined workflows, for example for exome resequencing, which are simple to deploy provided that your data has been generated by the SNP&SEQ Technology platform.
+Part 2: Time to run this!
+--------------------------
 
-Advantages of using Piper:
-* Simplifies process of deploying Queue on Uppmax
-* Has predefined workflows for many common NGS applications (WGS, exome, RNA read counts and differential expression)
-* Has predefined building blocks for running some common NGS tasks such as alignments, variant calling, etc.
+Up until this point we actually haven't actually run any jobs. Time to fix that!
 
-Running it locally
-------------------
-To run your new QScript locally go into the Piper folder and run the following (with any setup you prefer):
+*Exercise 5*<br/>
+By now you should have a functioning qscript. So lets try dry running it. Run the qscript like this:
 
-    ./piper -S <path to your script> <all other parameters> --job_runner Shell
+    # Assumes you are in the ~/Desktop/PiperWorkshop directory
+    piper -S MyAwesomeQScript.scala -i test_data/test1.fasta 
 
-This will make a dry run of the script. Showing you the command lines that will be run. To actually execute the jobs, add `-run`:
+You should now see Queue output indicating that the QScript was dry run. Well dry running isn't as fun as running it for real, so lets try that:
 
-    ./piper -S <path to your script> <all other parameters> --job_runner Shell -run
+    # Assumes you are in the ~/Desktop/PiperWorkshop directory
+    piper -S MyAwesomeQScript.scala -i test_data/test1.fasta -run
 
-Running it on Uppmax
---------------------
-To run qscripts on Uppmax there are somethings that you need to do. Piper communicates with SLURM using the DRMAA APIs. This means that you need to feed the cluster the required information (such as project id and walltime limit) somehow. The arguments which are required to be set are collected in the `Uppmaxable` trait in Piper, extending you qscript with this will automatically bring those to your script.
+What happens?
 
-Furthermore you need to specify the resource usage, this is done by wrapping you `CommandLineFunction` case classes in a class which extends the `UppmaxJob`, passing a `UppmaxConfig` instance as a argument. Each `CommandLineFunction` can then specify it's resource usage by extending classes called `OneCoreJob`, `TwoCoreJob`, etc. Sounds difficult? It's not that bad, look at the example below and see for yourself:
+You should see a your output files created in the output directory you specified. In addition to this a file for each job with a `.out` extension is create. This will contain the log for the program that created the file. 
 
-    package molmed.qscripts
-    
-    import org.broadinstitute.sting.queue.QScript
-    import java.io.File
-    import org.broadinstitute.sting.commandline.Argument
-    import molmed.utils.Uppmaxable
-    import molmed.utils.UppmaxConfig
-    import molmed.utils.UppmaxJob
-    
-    // Uppmaxable is a trait holding the necessary uppmax arguments
-    // to bring in.
-    class MyAwesomeQScript extends QScript with Uppmaxable {
-    
-      // An argument that should be passed to the QScript from the commandline 
-      @Input(doc = "input fasta file", shortName = "i", required = true)
-      var input: File = _
-    
-      // Where you define the pipeline
-      def script() {
-    
-        // Load the uppmax config (projId and uppmaxQosFlag both live in the Uppmaxable
-        // trait and can therefore be used here.
-        val uppmaxConfig = new UppmaxConfig(this.projId, this.uppmaxQoSFlag)
-        val uppmaxBase = new UppmaxBase(uppmaxConfig)
-    
-        // Defining names of output files
-        val seqCounts = new File("sequence_counts.txt")
-        val totalNumberOfReads = new File("total_read_nbr.txt")
-    
-        // Add jobs to dependency graph
-        add(uppmaxBase.NaiveSequenceCounter(input, seqCounts))
-        add(uppmaxBase.SumTotalNumberOfReads(seqCounts, totalNumberOfReads))
-    
-      }
-    
-      // Now our two classes are wrapped in a Uppmax base class which extends the
-      // UppmaxJob class. This holds the utility classes to specify resource
-      // usage.
-      class UppmaxBase(uppmaxConfig: UppmaxConfig) extends UppmaxJob(uppmaxConfig) {
-    
-        // Note the "extends OneCoreJob" part, which specifies that this job should request one core from the cluster.
-        // Other 
-        case class SumTotalNumberOfReads(@Input seqCounts: File, @Output totalNumberOfReads: File) extends OneCoreJob {
-          // Another way to define the commandline
-          def commandLine = required("cat") +
-            required(seqCounts) +
-            required(" |  awk \'{sum=sum+$1} END{print sum}\' >  ", escape = false) +
-            required(totalNumberOfReads)
-        }
-    
-        case class NaiveSequenceCounter(@Input fastaFile: File, @Output sequenceCounts: File) extends OneCoreJob {
-          // Simplest possible way to define commandline 
-          def commandLine = "cat " + fastaFile +
-            " | grep -v \"^>\" | sort | uniq -c >" +
-            sequenceCounts
-        }
-      }
-    
-    }
+Try `ls -la` and you should see that each job has a corresponding hidden file which the file extention `.done` this is how Queue knows what jobs have finished sucessfully and or not.
 
-This qscript is now ready to go, and be run on Uppmax. Log in to a node where you're allowed to run java (e.g. a interactive node).
+What happens if you run `piper -S MyAwesomeQScript.scala -i test_data/test1.fasta -run` again? Is the pipeline re-run? Remove one of the `.done` files and run it again. What's the difference?
 
-To run a qscript you need to add the the slurm-drmaa libraries on your library path. To get this run the following:
+Part 3: Make it distributed
+---------------------------
 
-    export LD_LIBRARY_PATH=/sw/apps/build/slurm-drmaa/1.0.6/lib/:$LD_LIBRARY_PATH
+Well running your jobs is cool, but running something in distrubuted mode is way cooler. The default "jobrunner" in Queue is the Shell jobrunner. By switching job runners you can make Queue run your jobs in a distrubuted fashion. The VM has a simulated Slurm environment setup for this purpose.
 
-You can now dry run the qscript using something like this:
+*Exercise 6*<br/>
 
-    ./piper -S <path to your script> <all other parameters> --job_runner Drmaa --job_walltime <time to request from cluster in seconds> --project_id <your uppmax project number>
+    # The -startFromScratch option will make sure the pipeline 
+    # is run even if all files are present
+    piper -S MyAwesomeQScript.scala -i test_data/test1.fasta -run -startFromScratch -jobRunner Drmaa
 
-Just as before, the script will not run, only create the dependency graph and make sure everything looks okey. Add `--run` to the command line to make it run the jobs, sending them to the cluster.
+You should now see that the DrmaaJobRunner submits jobs. Use the `squeue` command to see the job queue. (You might have to add a `sleep 10` to you commandlines to actually catch them in the Slurm queue, since the example files are so small these jobs will run very fast).
 
-Writing your first queue script
--------------------------------
+Please note that depending on your specific compute environment adding the `-jobRunner` argument might not be enough. Since the cluster environment might require additional information about the job such as project number to bill hours to etc. Using the `-jobNative` flag can be useful in such circumstances to to feed additional arguments to the cluster environment. Piper provides a number of utility classes to to this on then specific setup of the Uppmax Slurm cluster, and that might work in other environments as well.  
 
-Start by getting Piper and installing from Github (if you did this in the begining, you can skip it now):
-    
-    git clone https://github.com/johandahlberg/piper.git
-    cd piper
-    git checkout devel
-    ./setup.sh
+Part 4: Additional cool things (if time allows)
+-----------------------------------------------
 
-If you are using Scala-IDE for your development you can create a eclipse project to import by typing:
-
-    sbt/bin/sbt eclipse
-    
-This will create the files necessary to import the project into the Scala-IDE. 
-
-**Add a command line function** <br/>
-Starting from the example script above, we are now going to add an example command line which will count the number of occurrences of each base in the fasta file. The original command line will look something like this:
-
-    cat  [your fasta file] | grep -v "^>" | awk 'BEGIN{a=0; c=0; g=0; t=0;} {a+=gsub("A",""); c+=gsub("C",""); g+=gsub("G",""); t+=gsub("T","");} END{print a"\t"c"\t"g"\t"t}' > [some output file]
-
-Create a new file called `MyAwesomeQScript.scala`, and open it in Scala-IDE. Copy the qscript above into the editor and see if you can add the new `CommandLineFunction` to the qscript. When you've done so, try to run it, as above.
-
-**Process more than one file**<br/>
+**Running on multiple files**<br/>
 In the example above we have so far only processed one file - in real life that's seldom the case. One way to allow multiple input files of the same type is to use import:
 
     import org.broadinstitute.sting.queue.util.QScriptUtils
@@ -341,8 +263,8 @@ And use a construct like this:
         // Do something with the files
     }
 
+*Exercise 6*<br/>
 See if you can use this method to run your CommandLineFunctions on all the fasta files in the test data directory. A tip is that since Queue uses file names to build the dependency graph you need to make sure each output file gets a unique file name.
-
 
 **Adding a InProcessFunction**<br/>
 A `InProcessFunction` is a function which will not run as a command line, but Queue runs it as it would run any other Scala function, but based on the inputs and output it will know when in the workflow to run it.
@@ -376,15 +298,8 @@ This should run the following code to compile a very simplistic report:
 
       writer.close()
 
+
+*Exercise 7*<br/>
 Create the class, including a definition of the `run()` function and see if you can add it to your workflow.
 
-If there is time
------------------
-* See if you can implement some workflow that you normally use in Queue/Piper.
-* Explore the existing qscripts to see some more advanced examples. `DNABestPracticeVariantCalling` might be a good place to start since it implements a well recognized workflow of "bwa" -> "GATK best practice data processing" -> "variant calling".
-
-
-Troubleshooting
----------------
-* Need an import but don't know it's namespace? `ctrl + space` in Scala-IDE will give you a list of suggestions. Selecting one will auto-complete and import the necessary class.
-* If you have `ant 1.9.3` installed (which is the default version in e.g. Ubuntu 13.10) you need to revert to an earlier version. I used the .deb file found here: https://launchpad.net/ubuntu/+source/ant
+Congratulations, you've now finished this tutorial!
