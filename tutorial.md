@@ -70,21 +70,29 @@ When the console opens type `console` to initiate the Scala REPL. You can then t
     var y = "a"
     y = "b"
     
-    // Scala is a strongly type language with type inference. That means that the compiler will figure out types for you depending on the context. This means that the following is illegal:
-    y = 1 // y has type String, and 1 has type Int (in this case). This will not compile.
+    // Scala is a strongly type language with type inference.
+    // That means that the compiler will figure out types for you 
+    // depending on the context. This means that the following is illegal:
+    y = 1 // y has type String, 
+          // and 1 has type Int (in this case).
+          // This will not compile.
     
     // Declare a class
     class MyAwesomeClass(x: Int, s: String) { // Parameters are optional.
     // Class body
     }
     
-    // Declare a case class (a special type of class which where natural equals methods are auto generated, and that can be use to do pattern matching.
+    // Declare a case class (a special type of class which where natural
+    // equals methods are auto generated, and that can be use to do 
+    // pattern matching.
     case class Point(x: Int, y: Int)
     
-    // This means that the following will return true (which it would not do in Java without writing a custom equals method).
+    // This means that the following will return true (which it would 
+    // not do in Java without writing a custom equals method).
     Point(1, 1) == Point(1, 1)
     
-    // As Scala is a functional language, so functions are at the heart of it. Here is how you declare a very simple one:
+    // As Scala is a functional language, so functions are at the 
+    // heart of it. Here is how you declare a very simple one:
     def square(x: Int): Int = x * x
     
     // A slightly more complex example is
@@ -92,14 +100,20 @@ When the console opens type `console` to initiate the Scala REPL. You can then t
     def squareThanSum(x: List[Int]): Int = {
         val squared = x.map(y => y * y) // Square each element in the list
         val summed = squared.reduce((y, z) => y + z) // And sum the elements
-        summed // The last line in the function is returned - no need for a return keyword
+        summed // The last line in the function is returned
+               // no need for a return keyword
     }
     
     // Extending a class:
     class ColoredPoint(color: String)
-    class TwoDimensionalPoint(color: String, x: Int, y: Int) extends ColoredPoint(color)
+    class TwoDimensionalPoint(
+      color: String,
+      x: Int, y: Int) extends ColoredPoint(color)
     
-    // Scala also has something called traits (similar to interfaces in Java). A class can only inherit one class, but it can implement multiple traits. They can contain implemented fields and functions, or unimplemented ones (this will force the implementing class to provide a implementation).
+    // Scala also has something called traits (similar to interfaces in Java).
+    // A class can only inherit one class, but it can implement multiple traits.
+    // They can contain implemented fields and functions, or unimplemented ones
+    // (this will force the implementing class to provide a implementation).
     trait Pingable {
         def ping: String = "Pong"
         def pong: String
@@ -160,6 +174,8 @@ Here's a tiny example of what a QScript can look like:
         def script() {
             //...
         }
+
+        // Start adding your CommandLineFunction classes here
     }
 
 *Exercise 2*<br/>
