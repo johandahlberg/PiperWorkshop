@@ -270,7 +270,7 @@ Part 4: Additional cool things (if time allows)
 **Running on multiple files**<br/>
 In the example above we have so far only processed one file - in real life that's seldom the case. One way to allow multiple input files of the same type is to import:
 
-    import org.broadinstitute.sting.queue.util.QScriptUtils
+    import org.broadinstitute.gatk.queue.util.QScriptUtils
     
 And use a construct like this:    
 
@@ -299,13 +299,15 @@ Now, lets create a new case class called `CreateReport`, which has the following
 
 * totalNumberOfReadsFile: File
 * sequenceCountsFile: File
-* baseCountsFile: File
 
 And outputs:
 
 * report: File
 
 This should run the following code to compile a very simplistic report:
+
+      import scala.io.Source
+      import java.io.PrintWriter
 
       val writer = new PrintWriter(report)
 
@@ -322,7 +324,7 @@ This should run the following code to compile a very simplistic report:
 *Exercise 7*<br/>
 Create the class, including a definition of the `run()` function and see if you can add it to your workflow.
 
-**Putting it all together**<br/>
+*Exercise 8*<br/>
 Armed with the tools you've got so far - can you create a script which will count the number of occurences of base base (A, C, T, G) in the sequence parts of the fasta files, add this as another commandline tool, and add that information to the report? Use any tools you see fit to do the base counting.
 
 Congratulations, you've now finished this tutorial!
